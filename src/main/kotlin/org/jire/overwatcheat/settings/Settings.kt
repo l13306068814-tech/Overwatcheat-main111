@@ -1,0 +1,91 @@
+/*
+ * Free, open-source undetected color cheat for Overwatch!
+ * Copyright (C) 2017  Thomas G. Nappo
+ */
+
+package org.jire.overwatcheat.settings
+
+import org.jire.overwatcheat.aimbot.AimMode
+import org.jire.overwatcheat.util.PreciseSleeper
+import java.awt.event.KeyEvent
+import java.io.File
+
+object Settings {
+
+    internal val nameToSetting: MutableMap<String, Setting> = HashMap()
+
+    val aimKey by IntSetting("aim_key", 1)
+    val aimMode by IntSetting("aim_mode", AimMode.TRACKING.type)
+    val flickPixels by IntSetting("flick_shoot_pixels", 5)
+    val flickPause by LongSetting("flick_pause_duration", 300L)
+    val sensitivity by FloatSetting("sensitivity", 15.0F)
+    val fps by DoubleSetting("fps", 60.0)
+    val aimDurationMillis by FloatSetting("aim_duration_millis", 3.5F)
+    val aimDurationMultiplierBase by FloatSetting("aim_duration_multiplier_base", 1.0F)
+    val aimDurationMultiplierMax by FloatSetting("aim_duration_multiplier_max", 2.0F)
+    val aimMaxMovePixels by IntSetting("aim_max_move_pixels", 70)
+    val aimJitterPercent by IntSetting("aim_jitter_percent", 0)
+    val aimMinTargetWidth by IntSetting("aim_min_target_width", 2)
+    val aimMinTargetHeight by IntSetting("aim_min_target_height", 2)
+    val boxWidth by IntSetting("box_width", 256)
+    val boxHeight by IntSetting("box_height", 256)
+    val maxSnapDivisor by FloatSetting("max_snap_divisor", 2.0F)
+    val targetColors by HexIntArraySetting("target_colors", intArrayOf(0xd521cd, 0xd722cf, 0xd623ce, 0xd722ce, 0xd621cd, 0xce19ca, 0xd11ccb, 0xd21dca, 0xc818cf, 0xd722cd, 0xd722ce, 0xcd19c9, 0xc617d3, 0xcb17c5, 0xda25d3, 0xce24cc, 0xd328cc, 0xdb32ef, 0xbd15c4, 0xdc5bea, 0xda59eb, 0xd959e9, 0xf444fb, 0xcf1ac9, 0xd422d4, 0xd923cd, 0xe53af2, 0xd321d3, 0xe539f3, 0xe035ed, 0xd822cc, 0xe83df5, 0xd11fd1, 0xd622d0, 0xd21dcc, 0xd429e2, 0xe537ef, 0xd923cd, 0xe136ee, 0xd321d3, 0xe63bf3, 0xd722cf, 0xe036ee, 0xd72ce6, 0xd428e1, 0xd321d3, 0xd21dcc, 0xdf34ed, 0xd822cc, 0xe434e6, 0xd43ddf, 0xde30e4, 0xbe0dbe, 0xd823d3, 0xc814c4, 0xc20ab7, 0xde1ec1, 0xca16c6, 0xc30ebe, 0xbb0fbf, 0xc510bf, 0xc10cbc, 0xd21cb6, 0xca14c5, 0xb80cd1, 0xae0ea8, 0xbf0ec3, 0xd415c1, 0xbc22b7, 0xd317c4, 0xb1179d, 0xbc0fb4, 0xcc47c7, 0xb834b5, 0xdc2cd9, 0xd727d5, 0xde30da, 0xc834c6))
+    val targetColorTolerance by IntSetting("target_color_tolerance", 8)
+    val windowTitleSearch by StringSetting("window_title_search", "Overwatch")
+    val mouseId by IntSetting("mouse_id", 11)
+    val keyboardId by IntSetting("keyboard_id", 1)
+    val aimOffsetX by FloatSetting("aim_offset_x", 1.00F)
+    val aimOffsetY by FloatSetting("aim_offset_y", 0.75F)
+    val toggleInGameUI by BooleanSetting("toggle_in_game_ui", true)
+    val toggleKeyCodes by HexIntArraySetting("toggle_key_codes", intArrayOf(KeyEvent.VK_ALT, KeyEvent.VK_Z))
+    val aimPreciseSleeperType by IntSetting("aim_precise_sleeper_type", PreciseSleeper.YIELD.type)
+    val aimCpuThreadAffinityIndex by IntSetting("aim_cpu_thread_affinity_index", -1)
+
+    // === 🚀 核心：解锁你的 Rust 界面里的"拟人防封"全套神仙参数 ===
+    val aimSmoothingFactor by FloatSetting("aim_smoothing_factor", 0.03F)
+    val weightedAverageInfluence by FloatSetting("weighted_average_influence", 45.0F)
+    val historySize by IntSetting("history_size", 12)
+    val aimSmoothingAdjustmentAmplification by FloatSetting("aim_smoothing_adjustment_amplification", -3.0F)
+    val aimXTolerance by FloatSetting("aim_x_tolerance", 0.5F)
+    val maxUpwardMovement by IntSetting("max_upward_movement", 2)
+    val enableRandomSway by BooleanSetting("enable_random_sway", true)
+    val randomSwaySize by IntSetting("random_sway_size", 3)
+    val applyInitialReduction by BooleanSetting("apply_initial_reduction", true)
+
+    // 🚀 补上了缺失的这行，起手刹车防闪击参数！
+    val initialReductionAmount by FloatSetting("initial_reduction_amount", 1.005F)
+    // 🚀 [新增] 吃尾气终极克星：动态速度前馈预测系数 (0.0 = 关闭，1.0 = 完美同步跟枪)
+    val aimPredictionFactor by FloatSetting("aim_prediction_factor", 0.85F)
+    // 开火热键
+    val autoShoot by BooleanSetting("auto_shoot", false)
+    val autoShootKey by IntSetting("auto_shoot_key", 0)
+    val autoShootTriggerKey by IntSetting("auto_shoot_trigger_key", 1)
+
+    const val DEFAULT_FILE = "overwatcheat.cfg"
+
+    init {
+        read()
+    }
+
+    fun read(filePath: String = DEFAULT_FILE) = read(File(filePath))
+
+    fun read(file: File) {
+        if (!file.exists()) return
+        file.readLines().forEach {
+            if (!it.startsWith('#') && it.contains('=')) {
+                val split = it.split("=", limit = 2)
+                val settingName = split[0].trim()
+                val setting = nameToSetting[settingName] ?: return@forEach
+                val settingValue = split[1].trim()
+                try {
+                    setting.parse(settingValue)
+                } catch(e: Exception) {}
+            }
+        }
+    }
+
+    fun load(file: File = File(DEFAULT_FILE)) {
+        read(file)
+    }
+}

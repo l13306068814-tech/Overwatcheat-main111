@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="19">
+      <module name="gradle-build.main" target="11" />
+      <module name="gradle-build.test" target="11" />
+      <module name="overwatcheat_main" target="1.6" />
+      <module name="overwatcheat_test" target="1.6" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
